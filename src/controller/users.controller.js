@@ -6,27 +6,6 @@ import { uploadImageToCloudinary } from "../utils/cloudinary.utils.js";
 import { generateAccesstoken, generateRefreshtoken } from "../utils/tokens.utils.js";
 
 
-// cloudinary image upload k lye -------->>>>
-
-// cloudinary.config({ 
-//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-//     api_key: process.env.CLOUDINARY_API_KEY,
-//     api_secret: process.env.CLOUDINARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
-// });
-
-// // Tokens ------>>>>>
-
-// const generateAccesstoken = (user) =>{
-//   return jwt.sign({email : user.email},process.env.ACCESS_JWT_SECRET, {
-//    expiresIn : "6h"
-//   })
-//  }
-//  const generateRefreshtoken = (user) =>{
-//   return jwt.sign({email : user.email},process.env.REFRESH_JWT_SECRET, {
-//    expiresIn : "6h"
-//   })
-//  }
-
 //  register User-------->>>>>
 
 const registerUser = async (req, res) => {
@@ -111,7 +90,32 @@ const logoutUser = (req, res) => {
 };
 
 
-// Get all Users
+// get singleUser ------->>>>>
+
+const singleUser = async (req, res) => {
+  const decodedeUser = req.user;
+  
+  try {
+    if (!decodedeUser) {
+      return res.status(401).json({ message: "Unauthorized, no user found in token" });
+    }
+
+    const user = await User.findById(decodedeUser.id).select('-password -publishedBlogs');
+    if (!user) {
+      return res.status(404).json({ message: "User not found in database" });
+    }
+
+    res.status(200).json({ user }); // ✅ Wrap user in an object
+    console.log("Fetched User:", user); // ✅ CHECK THIS
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// Get all Users -------------->>>>>>>
 const getAllUsers = async (req, res) => {
   try {
     // Fetch all users from the database
@@ -160,22 +164,12 @@ const refreshToken = async (req,res)=>{
   }
 
 
-// const uploadImageToCloudinary = async (localpath) => {
-//   try {
-//     const uploadResult = await cloudinary.uploader.upload(localpath, {
-//       resource_type: "auto",
-//     });
-
-//     if (uploadResult) {
-//       fs.unlinkSync(localpath); // Delete local image
-//     }
-
-//     return uploadResult.url;
-//   } catch (error) {
-//     console.log(error);
-//     throw new Error("Error uploading image to Cloudinary");
-//   }
-// };
 
 
-export {registerUser,loginUser,logoutUser,refreshToken,getAllUsers}
+
+
+
+
+
+
+export {registerUser,loginUser,logoutUser,singleUser,refreshToken,getAllUsers}

@@ -1,21 +1,3 @@
-// import jwt from "jsonwebtoken";
-
-// const authenticateUser = async (req, res, next) => {
-//     const token = req.headers["authorization"];
-//     if (!token) return res.status(404).json({ message: "No token found" });
-  
-//     const tokenWithoutBearer = token.split(" ")[1]; // Remove 'Bearer ' part
-  
-//     jwt.verify(tokenWithoutBearer, process.env.ACCESS_JWT_SECRET, (err, user) => {
-//       if (err) return res.status(403).json({ message: "Invalid token" });
-//       req.user = user;
-//       next();
-//     });
-//   };
-  
-// export default authenticateUser
-
-
 import jwt from "jsonwebtoken";
 
 const authenticateUser = async (req, res, next) => {
