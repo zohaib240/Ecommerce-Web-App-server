@@ -100,7 +100,7 @@ const userProducts = async (req, res) => {
 
 const allProducts = async (req, res) => {
   const page = req.query?.page || 1; // Default page is 1
-  const limit = req.query?.limit || 10; // Default limit is 10
+  const limit = req.query?.limit || 12; // Default limit is 10
   const skip = (page - 1) * limit;
 
   try {
