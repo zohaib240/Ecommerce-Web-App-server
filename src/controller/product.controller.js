@@ -65,7 +65,38 @@ const singleProduct = async (req, res) => {
   }
 };
 
-  // get allProduct ----->>>
+
+// get user all products --------->>>>>>
+
+const userProducts = async (req, res) => {
+  const userId = req.user?.id;
+
+  if (!userId) {
+    return res.status(400).json({ error: "User ID is required" });
+  }
+
+  try {
+    // Prevent caching of this dynamic user-specific response 👇
+    res.setHeader("Cache-Control", "no-store");
+
+    const products = await productModel.find({ user: userId });
+
+    if (products.length === 0) {
+      return res.status(200).json({ message: "No products posted by this user." });
+    }
+
+    res.status(200).json({
+      message: "User products fetched successfully",
+      data: products,
+    });
+
+  } catch (error) {
+    console.error("❌ Error fetching user products:", error);
+    res.status(500).json({ message: "Something went wrong!", error: error.message });
+  }
+};
+
+// get allProduct ----->>>
 
 const allProducts = async (req, res) => {
   const page = req.query?.page || 1; // Default page is 1
@@ -73,16 +104,23 @@ const allProducts = async (req, res) => {
   const skip = (page - 1) * limit;
 
   try {
+    // 🛑 Prevent caching for fresh data every time
+    res.setHeader("Cache-Control", "no-store");
+
     const products = await productModel.find({}).skip(skip).limit(+limit);
+
     if (products.length === 0) {
       return res.status(200).json({ message: "No products left!" });
     }
+
     res.status(200).json(products);
+
   } catch (error) {
     console.log(error.message || error);
     res.status(500).json({ message: "Something went wrong!" });
   }
 };
+
 
 
 // deleteProduct ----->>>>>
@@ -160,4 +198,4 @@ const updateProduct = async (req, res) => {
 };
 
 
-  export  {addProduct,allProducts,deleteProduct,updateProduct,singleProduct}
+  export  {addProduct,allProducts,deleteProduct,updateProduct,singleProduct,userProducts}
