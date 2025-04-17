@@ -127,26 +127,63 @@ const allProducts = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   const { id } = req.params;
-  const  user  = req.user.id;  // User ID body se aa rahi hai
+  const user = req.user.id;  // ✅ Same as updateProduct
+  console.log("Request user object:", req.user);
+
   if (!id || !user) {
     return res.status(400).json({ error: "Post ID aur user ID required hain" });
   }
+
   try {
     const post = await productModel.findById(id);
     if (!post) {
       return res.status(404).json({ error: "Post nahi mila" });
     }
+
+    // 🔐 Check if the user owns the post
     if (post.user.toString() !== user) {
       return res.status(403).json({ error: "this is not your post" });
     }
+
+    // 📷 Delete image from Cloudinary
     await deleteImageFromCloudinary(post.postImage);
+
+    // 🗑️ Delete from DB
     await productModel.findByIdAndDelete(id);
 
-    res.json({ message: "Post successfully delete " });
+    res.json({ message: "Post successfully deleted" });
   } catch (error) {
+    console.log("Delete Error:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
+
+// const deleteProduct = async (req, res) => {
+//   const { id } = req.params;
+//   const  user  = req.user.id;  // User ID body se aa rahi hai
+//   console.log("Request user object:", req.user);
+//   if (!id || !user) {
+//     return res.status(400).json({ error: "Post ID aur user ID required hain" });
+//   }
+//   try {
+//     const post = await productModel.findById(id);
+//     if (!post) {
+//       return res.status(404).json({ error: "Post nahi mila" });
+//     }
+//     if (post.user.toString() !== user) {
+//       return res.status(403).json({ error: "this is not your post" });
+//     }
+//     await deleteImageFromCloudinary(post.postImage);
+//     await productModel.findByIdAndDelete(id);
+
+//     res.json({ message: "Post successfully delete " });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
  
 // update product  ----->>>>>> 
