@@ -15,7 +15,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [false, "profileImage is required"],
       },
-    
+      mobileNumber: {
+        type: Number,
+        required: [false, "Number is required"],
+      },
     email: {
     type: String,
     required: [true, "email is required"],

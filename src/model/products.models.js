@@ -15,6 +15,10 @@ const productSchema = new mongoose.Schema({
       required: true,
       min: 0,
     },
+    mobileNumber: {
+      type : Number,
+      required: true,
+    },
     postImage: {
         type: String,
         required: [true, "image is required"],

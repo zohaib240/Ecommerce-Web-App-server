@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from  "../model/users.model.js"
 import bcrypt from "bcrypt"
-import fs from "fs";
 import { uploadImageToCloudinary } from "../utils/cloudinary.utils.js";
 import { generateAccesstoken, generateRefreshtoken } from "../utils/tokens.utils.js";
 
@@ -9,9 +8,9 @@ import { generateAccesstoken, generateRefreshtoken } from "../utils/tokens.utils
 //  register User-------->>>>>
 
 const registerUser = async (req, res) => {
-  const { userName, fullName, email, password } = req.body;
+  const { userName, fullName, email, password, mobileNumber } = req.body;
 
-  if (!userName || !fullName || !email || !password) {
+  if (!userName || !fullName || !email || !password || !mobileNumber ) {
     return res.status(400).json({ error: "Email or password missing" });
   }
   
@@ -34,6 +33,7 @@ const registerUser = async (req, res) => {
       fullName,
       email,
       password,
+      mobileNumber,
       profilePicture,
     });
     res.json({
