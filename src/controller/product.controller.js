@@ -10,7 +10,7 @@ const addProduct = async (req,res) =>{
 
     const user = req.user.id
 
-    if (!name || !description || !user || !price || !mobileNumber ) {
+    if (!name || !description || !user || !price || !mobileNumber || !category  ) {
         return res.status(400).json({ error: "title or description or posted by required" });
       }   
 
@@ -34,7 +34,8 @@ try {
         mobileNumber,
         postImage,
         user,
-        price
+        price,
+        category
       });
       res.json({
         message: "product add successfully",
