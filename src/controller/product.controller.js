@@ -6,7 +6,7 @@ import { deleteImageFromCloudinary, uploadImageToCloudinary } from "../utils/clo
 // user post data ----->>>>>> 
 
 const addProduct = async (req,res) =>{
-    const {name,description,price,mobileNumber} = req.body
+    const {name,description,price,mobileNumber,category} = req.body
 
     const user = req.user.id
 
