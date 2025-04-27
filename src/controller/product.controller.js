@@ -78,9 +78,6 @@ const userProducts = async (req, res) => {
   }
 
   try {
-    // Prevent caching of this dynamic user-specific response 👇
-    res.setHeader("Cache-Control", "no-store");
-
     const products = await productModel.find({ user: userId });
 
     if (products.length === 0) {
