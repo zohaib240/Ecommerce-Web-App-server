@@ -99,29 +99,63 @@ const userProducts = async (req, res) => {
 };
 
 // get allProduct ----->>>
-
 const allProducts = async (req, res) => {
-  const page = req.query?.page || 1; // Default page is 1
-  const limit = req.query?.limit || 12; // Default limit is 10
-  const skip = (page - 1) * limit;
+  // Extracting query parameters from the request
+  const page = parseInt(req.query.page) || 1; // Default page 1
+  const limit = parseInt(req.query.limit) || 12; // Default limit 12
+  const category = req.query.category || null; // Extracting category (if any)
+  const skip = (page - 1) * limit; // Skipping the products to get the current page's data
 
   try {
-    // 🛑 Prevent caching for fresh data every time
+    // Prevent caching to always fetch fresh data
     res.setHeader("Cache-Control", "no-store");
 
-    const products = await productModel.find({}).skip(skip).limit(+limit);
+    // Creating a dynamic filter object
+    const filter = {}; 
+    if (category) {
+      filter.category = category; // Filter by category if passed
+    }
 
+    // Fetching the products with the filter, skip, and limit
+    const products = await productModel.find(filter).skip(skip).limit(limit);
+
+    // If no products are found
     if (products.length === 0) {
       return res.status(200).json({ message: "No products left!" });
     }
 
+    // Returning the products as JSON
     res.status(200).json(products);
 
   } catch (error) {
-    console.log(error.message || error);
-    res.status(500).json({ message: "Something went wrong!" });
+    console.log(error.message || error); // Log any errors
+    res.status(500).json({ message: "Something went wrong!" }); // Internal server error
   }
 };
+
+
+// const allProducts = async (req, res) => {
+//   const page = req.query?.page || 1; // Default page is 1
+//   const limit = req.query?.limit || 12; // Default limit is 10
+//   const skip = (page - 1) * limit;
+
+//   try {
+//     // 🛑 Prevent caching for fresh data every time
+//     res.setHeader("Cache-Control", "no-store");
+
+//     const products = await productModel.find({}).skip(skip).limit(+limit);
+
+//     if (products.length === 0) {
+//       return res.status(200).json({ message: "No products left!" });
+//     }
+
+//     res.status(200).json(products);
+
+//   } catch (error) {
+//     console.log(error.message || error);
+//     res.status(500).json({ message: "Something went wrong!" });
+//   }
+// };
 
 
 
