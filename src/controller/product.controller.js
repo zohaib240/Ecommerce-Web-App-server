@@ -6,6 +6,7 @@ import { deleteImageFromCloudinary, uploadImageToCloudinary } from "../utils/clo
 // user post data ----->>>>>> 
 
 const addProduct = async (req,res) =>{
+  console.log("req.body:", req.body); // 👈 yeh line daalni hai
     const {name,description,price,mobileNumber,category} = req.body
 
     const user = req.user.id
@@ -41,6 +42,8 @@ try {
         message: "product add successfully",
         data: createPosts,
       });
+      console.log("Saved Product:", createPosts);
+
     
 } catch (error) {
     res.status(500).json({ error: error.message });
