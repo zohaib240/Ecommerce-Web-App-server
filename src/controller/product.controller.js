@@ -71,6 +71,41 @@ const singleProduct = async (req, res) => {
 };
 
 
+
+
+// ✅ Public Single Product Controller
+
+export const publicSingleProduct = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ error: "Product ID required" });
+  }
+
+  try {
+    const product = await productModel.findById(id).populate("user", "name");
+
+    if (!product) {
+      return res.status(404).json({ error: "No product found" });
+    }
+
+    res.status(200).json({
+      _id: product._id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      image: product.postImage,
+      category: product.category,
+      sellerName: product.user.name,
+    });
+  } catch (error) {
+    console.error(error.message || error);
+    res.status(500).json({ message: "Something went wrong!" });
+  }
+};
+
+
+
 // get user all products --------->>>>>>
 
 const userProducts = async (req, res) => {
@@ -244,4 +279,4 @@ const updateProduct = async (req, res) => {
 };
 
 
-  export  {addProduct,allProducts,deleteProduct,updateProduct,singleProduct,userProducts}
+  export  {addProduct,allProducts,deleteProduct,updateProduct,singleProduct,userProducts,publicSingleProduct}

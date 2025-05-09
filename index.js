@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import productRouter from "./src/routes/products.routes.js";
 import { orderRouter } from "./src/routes/orders.routes.js";
 import cors from "cors"
+import { cartRouter } from "./src/routes/cart.routes.js";
 dotenv.config();
 
 const app = express(); // `app` ko pehle initialize karo
@@ -33,6 +34,8 @@ app.use(cookieParser());
 app.use("/api/v1", router);
 app.use("/api/v1", productRouter);
 app.use("/api/v1", orderRouter);  
+app.use("/api/v1", cartRouter);
+
 
 
 app.get('/',(req,res)=>{
