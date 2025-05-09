@@ -75,7 +75,8 @@ const singleProduct = async (req, res) => {
 
 // ✅ Public Single Product Controller
 
-export const publicSingleProduct = async (req, res) => {
+const publicSingleProduct = async (req, res) => {
+
   const { id } = req.params;
 
   if (!id) {
