@@ -84,7 +84,7 @@ const publicSingleProduct = async (req, res) => {
   }
 
   try {
-    const product = await productModel.findById(id).populate("user", "name");
+    const product = await productModel.findById(id).populate("user", "name" , "mobileNumber");
 
     if (!product) {
       return res.status(404).json({ error: "No product found" });
@@ -94,6 +94,7 @@ const publicSingleProduct = async (req, res) => {
       _id: product._id,
       name: product.name,
       description: product.description,
+      mobileNumber: product.mobileNumber,
       price: product.price,
       image: product.postImage,
       category: product.category,
