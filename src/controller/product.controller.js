@@ -51,6 +51,40 @@ try {
 }
 }
 
+// like product --------->>>>>>>
+
+const likeProduct = async (req, res) => {
+  const productId = req.params.id;
+  const userId = req.user.id;
+
+  try {
+    const product = await productModel.findById(productId);
+    if (!product) return res.status(404).json({ error: "Product nahi mila" });
+
+    const alreadyLiked = product.likes.includes(userId);
+
+    if (alreadyLiked) {
+      // Unlike
+      product.likes = product.likes.filter(id => id.toString() !== userId);
+    } else {
+      // Like
+      product.likes.push(userId);
+    }
+
+    await product.save();
+
+    res.status(200).json({ 
+      message: alreadyLiked ? "Product unliked" : "Product liked",
+      likes: product.likes.length 
+    });
+
+  } catch (error) {
+    console.error("Like Error:", error.message);
+    res.status(500).json({ error: "Kuch galti ho gayi, try again later." });
+  }
+};
+
+
 // get singleProduct ----->>>
 
 const singleProduct = async (req, res) => {
@@ -107,8 +141,7 @@ const publicSingleProduct = async (req, res) => {
 };
 
 
-
-// get user all products --------->>>>>>
+// user all products --------->>>>>>>
 
 const userProducts = async (req, res) => {
   const userId = req.user?.id;
@@ -135,7 +168,10 @@ const userProducts = async (req, res) => {
   }
 };
 
+
+
 // get allProduct ----->>>
+
 const allProducts = async (req, res) => {
   // Extracting query parameters from the request
   const page = parseInt(req.query.page) || 1; // Default page 1
@@ -169,32 +205,6 @@ const allProducts = async (req, res) => {
     res.status(500).json({ message: "Something went wrong!" }); // Internal server error
   }
 };
-
-
-// const allProducts = async (req, res) => {
-//   const page = req.query?.page || 1; // Default page is 1
-//   const limit = req.query?.limit || 12; // Default limit is 10
-//   const skip = (page - 1) * limit;
-
-//   try {
-//     // 🛑 Prevent caching for fresh data every time
-//     res.setHeader("Cache-Control", "no-store");
-
-//     const products = await productModel.find({}).skip(skip).limit(+limit);
-
-//     if (products.length === 0) {
-//       return res.status(200).json({ message: "No products left!" });
-//     }
-
-//     res.status(200).json(products);
-
-//   } catch (error) {
-//     console.log(error.message || error);
-//     res.status(500).json({ message: "Something went wrong!" });
-//   }
-// };
-
-
 
 // deleteProduct ----->>>>>
 
@@ -281,4 +291,4 @@ const updateProduct = async (req, res) => {
 };
 
 
-  export  {addProduct,allProducts,deleteProduct,updateProduct,singleProduct,userProducts,publicSingleProduct}
+  export  {addProduct,allProducts,deleteProduct,updateProduct,singleProduct,userProducts,publicSingleProduct,likeProduct}

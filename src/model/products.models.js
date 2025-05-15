@@ -32,13 +32,10 @@ const productSchema = new mongoose.Schema({
      ref: "User",
      required: true
      },
-  orders: [
-      {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Order"
-      }
-  ]
-    
+     likes: [{
+        type : mongoose.Schema.Types.ObjectId,
+        ref : "User"
+      }],
 },
 { timestamps: true }
 );
