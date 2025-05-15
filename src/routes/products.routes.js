@@ -12,7 +12,7 @@ productRouter.get("/allProduct", allProducts);
 productRouter.get("/singleProduct/:id",authenticateUser , singleProduct);
 productRouter.get("/publicsingleProduct/:id" , publicSingleProduct);
 productRouter.delete("/deleteProduct/:id",authenticateUser, deleteProduct);  // Route updated with postId
-productRouter.delete("/likeProduct/:id",authenticateUser, likeProduct);  // Route updated with postId
+productRouter.put("/likeProduct/:id",authenticateUser, likeProduct);  // Route updated with postId
 productRouter.put("/updateProduct/:id",authenticateUser, upload.single("image"), updateProduct);
 
 export default productRouter;
