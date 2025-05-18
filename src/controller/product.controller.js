@@ -51,15 +51,51 @@ try {
 }
 }
 
-// like product --------->>>>>>>
+// // like product --------->>>>>>>
+
+// const likeProduct = async (req, res) => {
+//   const productId = req.params.id;
+//   const userId = req.user.id;
+
+//   try {
+//     const product = await productModel.findById(productId);
+//     if (!product) return res.status(404).json({ error: "Product nahi mila" });
+
+//     const alreadyLiked = product.likes.includes(userId);
+
+//     if (alreadyLiked) {
+//       // Unlike
+//       product.likes = product.likes.filter(id => id.toString() !== userId);
+//     } else {
+//       // Like
+//       product.likes.push(userId);
+//     }
+
+//     await product.save();
+
+//     res.status(200).json({ 
+//       message: alreadyLiked ? "Product unliked" : "Product liked",
+//       likes: product.likes.length 
+//     });
+
+//   } catch (error) {
+//     console.error("Like Error:", error.message);
+//     res.status(500).json({ error: "Kuch galti ho gayi, try again later." });
+//   }
+// };
+
+
+// Like/Unlike Product Controller
 
 const likeProduct = async (req, res) => {
   const productId = req.params.id;
-  const userId = req.user.id;
+  const userId = req.user.id; // Assume user middleware ne req.user set kiya hai
 
   try {
     const product = await productModel.findById(productId);
-    if (!product) return res.status(404).json({ error: "Product nahi mila" });
+    if (!product) {
+      return res.status(404).json({ error: "Product nahi mila" });
+    }
 
     const alreadyLiked = product.likes.includes(userId);
 
@@ -73,16 +109,17 @@ const likeProduct = async (req, res) => {
 
     await product.save();
 
-    res.status(200).json({ 
+    return res.status(200).json({
       message: alreadyLiked ? "Product unliked" : "Product liked",
-      likes: product.likes.length 
+      likes: product.likes, // 🟢 Full array return kar rahe hain yahan
     });
-
   } catch (error) {
     console.error("Like Error:", error.message);
-    res.status(500).json({ error: "Kuch galti ho gayi, try again later." });
+    return res.status(500).json({ error: "Kuch galti ho gayi, try again later." });
   }
 };
+
+
 
 
 // get singleProduct ----->>>
