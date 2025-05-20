@@ -23,6 +23,10 @@ const productSchema = new mongoose.Schema({
       type: String,
       required: true,
     },  
+     location: {
+      type: String,
+      required: true,
+    },  
     postImage: {
         type: String,
         required: [true, "image is required"],
@@ -35,7 +39,7 @@ const productSchema = new mongoose.Schema({
      likes: [{
         type : mongoose.Schema.Types.ObjectId,
         ref : "User"
-      }],
+      }]
 },
 { timestamps: true }
 );

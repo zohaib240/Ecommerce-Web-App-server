@@ -5,84 +5,125 @@ import { deleteImageFromCloudinary, uploadImageToCloudinary } from "../utils/clo
   
 // user post data ----->>>>>> 
 
-const addProduct = async (req,res) =>{
-  console.log("req.body:", req.body); // 👈 yeh line daalni hai
-    const {name,description,price,mobileNumber,category} = req.body
 
-    const user = req.user.id
+const addProduct = async (req, res) => {
+  console.log("req.body:", req.body); // 👈 debugging
 
-    if (!name || !description || !user || !price || !mobileNumber || !category  ) {
-        return res.status(400).json({ error: "title or description or posted by required" });
-      }   
+  const {
+    name,
+    description,
+    price,
+    mobileNumber,
+    category,
+    location,        // 👈 location destructure
+  } = req.body;
 
-try {
-   // Check if the user is registered
-   const postUser = await User.findById(user); // Verify user by their ID
-   if (!postUser) {
-     return res.status(404).json({ message: "User not found. Please register to post." });
-   }
+  const user = req.user.id;
+
+  // 🛑 Required fields check (including location)
+  if (
+    !name ||
+    !description ||
+    !user ||
+    !price ||
+    !mobileNumber ||
+    !category ||
+    !location      // 👈 location validation
+  ) {
+    return res
+      .status(400)
+      .json({ error: "All fields including location are required" });
+  }
+
+  try {
+    // Verify user by their ID
+    const postUser = await User.findById(user);
+    if (!postUser) {
+      return res
+        .status(404)
+        .json({ message: "User not found. Please register to post." });
+    }
+
+    // Image file check
     if (!req.file) {
-        return res.status(400).json({ error: "Profile image is required" });
-      }
-      
-//    upload image on  cloudinary and response url from cloudinary
-      const postImage = await uploadImageToCloudinary(req.file.buffer);
-      console.log(postImage);
+      return res
+        .status(400)
+        .json({ error: "Product image is required" });
+    }
 
-      const createPosts = await productModel.create({
-        name,
-        description,
-        mobileNumber,
-        postImage,
-        user,
-        price,
-        category
-      });
-      res.json({
-        message: "product add successfully",
-        data: createPosts,
-      });
-      console.log("Saved Product:", createPosts);
+    // Upload image to Cloudinary
+    const postImage = await uploadImageToCloudinary(req.file.buffer);
+    console.log("Cloudinary URL:", postImage);
+
+    // Create product with location
+    const createPosts = await productModel.create({
+      name,
+      description,
+      mobileNumber,
+      postImage,
+      user,
+      price,
+      category,
+      location,     // 👈 save location
+    });
+
+    console.log("Saved Product:", createPosts);
+    res.status(201).json({
+      message: "Product added successfully",
+      data: createPosts,
+    });
+  } catch (error) {
+    console.error("Error in addProduct:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+// const addProduct = async (req,res) =>{
+//   console.log("req.body:", req.body); // 👈 yeh line daalni hai
+//     const {name,description,price,mobileNumber,category} = req.body
+
+//     const user = req.user.id
+
+//     if (!name || !description || !user || !price || !mobileNumber || !category  ) {
+//         return res.status(400).json({ error: "title or description or posted by required" });
+//       }   
+
+// try {
+//    // Check if the user is registered
+//    const postUser = await User.findById(user); // Verify user by their ID
+//    if (!postUser) {
+//      return res.status(404).json({ message: "User not found. Please register to post." });
+//    }
+//     if (!req.file) {
+//         return res.status(400).json({ error: "Profile image is required" });
+//       }
+      
+// //    upload image on  cloudinary and response url from cloudinary
+//       const postImage = await uploadImageToCloudinary(req.file.buffer);
+//       console.log(postImage);
+
+//       const createPosts = await productModel.create({
+//         name,
+//         description,
+//         mobileNumber,
+//         postImage,
+//         user,
+//         price,
+//         category
+//       });
+//       res.json({
+//         message: "product add successfully",
+//         data: createPosts,
+//       });
+//       console.log("Saved Product:", createPosts);
 
     
-} catch (error) {
-    res.status(500).json({ error: error.message });
+// } catch (error) {
+//     res.status(500).json({ error: error.message });
 
-}
-}
-
-// // like product --------->>>>>>>
-
-// const likeProduct = async (req, res) => {
-//   const productId = req.params.id;
-//   const userId = req.user.id;
-
-//   try {
-//     const product = await productModel.findById(productId);
-//     if (!product) return res.status(404).json({ error: "Product nahi mila" });
-
-//     const alreadyLiked = product.likes.includes(userId);
-
-//     if (alreadyLiked) {
-//       // Unlike
-//       product.likes = product.likes.filter(id => id.toString() !== userId);
-//     } else {
-//       // Like
-//       product.likes.push(userId);
-//     }
-
-//     await product.save();
-
-//     res.status(200).json({ 
-//       message: alreadyLiked ? "Product unliked" : "Product liked",
-//       likes: product.likes.length 
-//     });
-
-//   } catch (error) {
-//     console.error("Like Error:", error.message);
-//     res.status(500).json({ error: "Kuch galti ho gayi, try again later." });
-//   }
-// };
+// }
+// }
 
 
 // Like/Unlike Product Controller
@@ -111,11 +152,11 @@ const likeProduct = async (req, res) => {
 
     return res.status(200).json({
       message: alreadyLiked ? "Product unliked" : "Product liked",
-      likes: product.likes, // 🟢 Full array return kar rahe hain yahan
+      likes: product.likes, 
     });
   } catch (error) {
     console.error("Like Error:", error.message);
-    return res.status(500).json({ error: "Kuch galti ho gayi, try again later." });
+    return res.status(500).json({ error: "mistake, try again later." });
   }
 };
 
