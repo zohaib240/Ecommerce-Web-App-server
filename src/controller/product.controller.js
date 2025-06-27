@@ -129,6 +129,7 @@ const addProduct = async (req, res) => {
 // Like/Unlike Product Controller
 
 const likeProduct = async (req, res) => {
+    console.log("User from token:", req.user); // ⬅⬅⬅ ADD THIS LINE
   const productId = req.params.id;
   const userId = req.user.id; // Assume user middleware ne req.user set kiya hai
 
@@ -161,6 +162,112 @@ const likeProduct = async (req, res) => {
 };
 
 
+// Comment on Product Controller
+
+const commentProduct = async (req, res) => {
+  const productId = req.params.id;
+  const userId = req.user.id;
+  const { text } = req.body;
+
+  try {
+    if (!text || text.trim() === "") {
+      return res.status(400).json({ error: "Comment text is required" });
+    }
+
+    const product = await productModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product nahi mila" });
+    }
+
+    // Add comment
+    product.comments.push({
+      user: userId,
+      text,
+    });
+
+    await product.save();
+    const updatedProduct = await productModel
+      .findById(productId)
+      .populate("comments.user", "userName email");
+    return res.status(200).json({
+      message: "Comment added successfully",
+      comments: updatedProduct.comments,
+    });
+  } catch (error) {
+    console.error("Comment Error:", error.message);
+    return res.status(500).json({ error: "Mistake, try again later." });
+  }
+};
+
+// delete comment -------------->>>>>>
+
+const deleteComment = async (req, res) => {
+  const productId = req.params.productId;
+  const commentId = req.params.commentId;
+  const userId = req.user.id;
+
+  try {
+    const product = await productModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product nahi mila" });
+    }
+
+    // Find the comment
+    const comment = product.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ error: "Comment nahi mila" });
+    }
+
+    // Sirf comment owner hi delete kar sakta hai
+    if (comment.user.toString() !== userId) {
+      return res.status(403).json({ error: "Tumhara comment nahi hai, delete nahi kar sakte" });
+    }
+
+   await productModel.findByIdAndUpdate(productId, {
+  $pull: { comments: { _id: commentId } }
+});
+
+    await product.save();
+
+    // Populate after deletion
+    const updatedProduct = await productModel
+      .findById(productId)
+      .populate("comments.user", "userName email");
+
+    return res.status(200).json({
+      message: "Comment deleted successfully",
+      comments: updatedProduct.comments,
+    });
+  } catch (error) {
+    console.error("Delete Comment Error:", error.message);
+    return res.status(500).json({ error: "Mistake, try again later." });
+  }
+};
+
+
+
+// all comments ------->>>>>>
+
+const getComments = async (req, res) => {
+  const productId = req.params.productId;  // ya req.params.id — route ke hisaab se
+
+  try {
+    const product = await productModel
+      .findById(productId)
+      .populate("comments.user", "userName email");
+
+    if (!product) {
+      return res.status(404).json({ error: "Product nahi mila" });
+    }
+
+    return res.status(200).json({
+      comments: product.comments,
+    });
+  } catch (error) {
+    console.error("Get Comments Error:", error.message);
+    return res.status(500).json({ error: "Mistake, try again later." });
+  }
+};
 
 
 // get singleProduct ----->>>
@@ -196,7 +303,7 @@ const publicSingleProduct = async (req, res) => {
   }
 
   try {
-    const product = await productModel.findById(id).populate("user", "name mobileNumber" );
+    const product = await productModel.findById(id);
 
     if (!product) {
       return res.status(404).json({ error: "No product found" });
@@ -209,7 +316,9 @@ const publicSingleProduct = async (req, res) => {
       mobileNumber: product.mobileNumber,
       price: product.price,
       image: product.postImage,
+      likes: product.likes,
       category: product.category,
+      location: product.location,
       sellerName: product.user.name,
     });
   } catch (error) {
@@ -253,7 +362,7 @@ const userProducts = async (req, res) => {
 const allProducts = async (req, res) => {
   // Extracting query parameters from the request
   const page = parseInt(req.query.page) || 1; // Default page 1
-  const limit = parseInt(req.query.limit) || 12; // Default limit 12
+  const limit = parseInt(req.query.limit) || 15; // Default limit 12
   const category = req.query.category || null; // Extracting category (if any)
   const skip = (page - 1) * limit; // Skipping the products to get the current page's data
 
@@ -369,4 +478,4 @@ const updateProduct = async (req, res) => {
 };
 
 
-  export  {addProduct,allProducts,deleteProduct,updateProduct,singleProduct,userProducts,publicSingleProduct,likeProduct}
+  export  {addProduct,allProducts,deleteProduct,updateProduct,singleProduct,userProducts,publicSingleProduct,likeProduct,commentProduct,deleteComment,getComments}
