@@ -78,60 +78,12 @@ const addProduct = async (req, res) => {
   }
 };
 
-
-// const addProduct = async (req,res) =>{
-//   console.log("req.body:", req.body); // 👈 yeh line daalni hai
-//     const {name,description,price,mobileNumber,category} = req.body
-
-//     const user = req.user.id
-
-//     if (!name || !description || !user || !price || !mobileNumber || !category  ) {
-//         return res.status(400).json({ error: "title or description or posted by required" });
-//       }   
-
-// try {
-//    // Check if the user is registered
-//    const postUser = await User.findById(user); // Verify user by their ID
-//    if (!postUser) {
-//      return res.status(404).json({ message: "User not found. Please register to post." });
-//    }
-//     if (!req.file) {
-//         return res.status(400).json({ error: "Profile image is required" });
-//       }
-      
-// //    upload image on  cloudinary and response url from cloudinary
-//       const postImage = await uploadImageToCloudinary(req.file.buffer);
-//       console.log(postImage);
-
-//       const createPosts = await productModel.create({
-//         name,
-//         description,
-//         mobileNumber,
-//         postImage,
-//         user,
-//         price,
-//         category
-//       });
-//       res.json({
-//         message: "product add successfully",
-//         data: createPosts,
-//       });
-//       console.log("Saved Product:", createPosts);
-
-    
-// } catch (error) {
-//     res.status(500).json({ error: error.message });
-
-// }
-// }
-
-
-// Like/Unlike Product Controller
+// Like/Unlike Product Controller  ------>>>>>
 
 const likeProduct = async (req, res) => {
     console.log("User from token:", req.user); // ⬅⬅⬅ ADD THIS LINE
   const productId = req.params.id;
-  const userId = req.user.id; // Assume user middleware ne req.user set kiya hai
+  const userId = req.user.id; 
 
   try {
     const product = await productModel.findById(productId);
@@ -249,7 +201,7 @@ const deleteComment = async (req, res) => {
 // all comments ------->>>>>>
 
 const getComments = async (req, res) => {
-  const productId = req.params.productId;  // ya req.params.id — route ke hisaab se
+  const productId = req.params.productId;  
 
   try {
     const product = await productModel
@@ -362,7 +314,7 @@ const userProducts = async (req, res) => {
 const allProducts = async (req, res) => {
   // Extracting query parameters from the request
   const page = parseInt(req.query.page) || 1; // Default page 1
-  const limit = parseInt(req.query.limit) || 15; // Default limit 12
+  const limit = parseInt(req.query.limit) || 15; // Default limit 15
   const category = req.query.category || null; // Extracting category (if any)
   const skip = (page - 1) * limit; // Skipping the products to get the current page's data
 
